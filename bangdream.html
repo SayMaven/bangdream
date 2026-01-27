@@ -791,6 +791,18 @@
         </div>
       </div>
     </div>
+    <div id="username-modal" class="modal" style="display: flex;"> <div class="modal-content" style="text-align: center; border: 2px solid #ff69b4;">
+    <h3 style="color: #333;">Siapa Nama Kamu?</h3>
+    
+    <input type="text" id="custom-username-input" 
+           placeholder="Ketik nama di sini..." maxlength="10"
+           style="width: 80%; padding: 10px; font-size: 18px; border-radius: 10px; border: 2px solid #4d4d4d; text-align: center;">
+    
+    <br><br>
+    
+    <button id="save-username-btn" class="end-button" style="margin: 0; color: #ff69b4">Mulai Main</button>
+  </div>
+</div>
     <!-- 加载进度界面 -->
     <div>
       <img id="leaderboard-button" style="display: none; cursor: pointer"/>
@@ -883,9 +895,9 @@
 <script>
   (function () {
     let mode = 'prod';
-    // 公共前缀
     let IMG_PATH = mode == 'local' ? 'img/' : './img/';
-    // let API_PATH = mode == 'local' ? 'http://localhost/dev-api/' : 'https://badmintonranks.com/prod-api/';
+    // let API_PATH = mode == 'local' ? 'http://localhost/dev-api/' : 'https://badmintonranks.com/prod-api/'; 
+    let API_PATH = mode == 'local' ? 'http://127.0.0.1:8000/' : 'https://bangdream-api.vercel.app/';
     let currentLang = 'id';
     const languages = {
       id: {
@@ -1024,7 +1036,41 @@
         show_myRecent: '自分の最近30回',
       }
     };
+    // LOGIKA MODAL USERNAME BARU
+    const usernameModal = document.getElementById('username-modal');
+    const usernameInput = document.getElementById('custom-username-input');
+    const saveUsernameBtn = document.getElementById('save-username-btn');
+    
+    // 1. Cek apakah user sudah punya nama?
+    let storedName = localStorage.getItem("bd_username");
+    
+    if (storedName) {
+        // Kalau sudah ada nama, sembunyikan modal langsung
+        usernameModal.style.display = 'none';
+        usernameInput.value = storedName; // Isi input buat jaga-jaga
+    } else {
+        // Kalau belum ada nama, pastikan modal muncul
+        usernameModal.style.display = 'flex';
+    }
 
+    // 2. Fungsi saat tombol "Mulai Main" diklik
+    saveUsernameBtn.addEventListener('click', () => {
+        let inputName = usernameInput.value.trim();
+        
+        // Validasi: Kalau kosong, kasih nama Guest
+        if (!inputName) {
+            inputName = "Guest_" + Math.floor(Math.random() * 1000);
+        }
+        
+        // Simpan ke memori
+        localStorage.setItem("bd_username", inputName);
+        
+        // Sembunyikan modal
+        usernameModal.style.display = 'none';
+        
+        // (Opsional) Update tampilan nama di layar jika ada elemennya
+        // document.getElementById('my-id').textContent = `ID: ${getPlayerId()} (${inputName})`;
+    });
 
     // 设首页图片
     const setIndexImage = () => {
@@ -1308,13 +1354,19 @@
     // 发送游戏结果统计
     async function gameStat(playerId, levels, difficulty, fps, win, ranks, duration, kumaKill, kumaLive,
                       maxCombo, life, lifeLost, bossRatio, bulletRatio, itemRatio, finalScore) {
+      
+      // AMBIL NAMA DARI MEMORI
+      let currentUsername = localStorage.getItem("bd_username") || "Guest";
+
       fetch(API_PATH + 'gameStat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          playerId, levels, difficulty, fps, win, ranks, duration, kumaKill, kumaLive,
+          playerId, 
+          username: currentUsername, // <--- INI TAMBAHAN PENTINGNYA
+          levels, difficulty, fps, win, ranks, duration, kumaKill, kumaLive,
           maxCombo, life, lifeLost, bossRatio, bulletRatio, itemRatio, finalScore
         })
       });
