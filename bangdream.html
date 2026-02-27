@@ -1933,7 +1933,7 @@
         this.height = this.width; // 小熊高度
         this.x = x; // X坐标
         this.y = y; // Y坐标
-        this.baseSpeed = canvasHeight * 0.3; // 基础移动速度
+        this.baseSpeed = canvasHeight * 3.0; // 基础移动速度
         this.speed = this.baseSpeed; // 当前移动速度
         this.health = currentLevel === 2 ? 15 : 5; // 第2关小熊血量为15，第1关为5
         this.animTimer = 0; // 动画计时器（毫秒）
@@ -1946,7 +1946,7 @@
       applySlow() {
         if (!this.slowEffect) {
           this.slowEffect = true;
-          this.speed = this.baseSpeed * 3.0; // 降低75%移动速度
+          this.speed = this.baseSpeed * 0.25; // 降低75%移动速度
           this.slowTimer = 3000; // 减速效果持续3秒
         }
       }
